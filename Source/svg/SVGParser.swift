@@ -928,8 +928,8 @@ open class SVGParser {
 
     fileprivate func parseRect(_ rect: XMLIndexer) -> Locus? {
         guard let element = rect.element,
-              let width = getDoubleValue(element, attribute: "width"),
-              let height = getDoubleValue(element, attribute: "height"), width > 0 && height > 0 else {
+              let width = getDoubleValueFromPercentage(element, attribute: "width"),
+              let height = getDoubleValueFromPercentage(element, attribute: "height"), width > 0 && height > 0 else {
 
             return .none
         }
@@ -1712,8 +1712,12 @@ open class SVGParser {
             return self.getDoubleValue(element, attribute: attribute)
         } else {
             let value = attributeValue.replacingOccurrences(of: "%", with: "")
+            
+            guard let _svgElement = self.svgElement, let layout = try? self.parseViewBox(_svgElement), let viewBox = layout.viewBox else {
+                return .none
+            }
             if let doubleValue = Double(value) {
-                return doubleValue / 100
+                return doubleValue / 100 * viewBox.w
             }
         }
         return .none
