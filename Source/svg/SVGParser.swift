@@ -925,8 +925,8 @@ open class SVGParser {
 
     fileprivate func parseRect(_ rect: XMLIndexer) -> Locus? {
         guard let element = rect.element,
-              let width = getDoubleValue(element, attribute: "width"),
-              let height = getDoubleValue(element, attribute: "height"), width > 0 && height > 0 else {
+              let width = getDoubleValueFromPercentage(element, attribute: "width"),
+              let height = getDoubleValueFromPercentage(element, attribute: "height"), width > 0 && height > 0 else {
 
             return .none
         }
