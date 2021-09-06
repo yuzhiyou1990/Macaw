@@ -111,6 +111,7 @@ open class SVGParser {
     fileprivate var defClip = [String: UserSpaceLocus]()
     fileprivate var defEffects = [String: Effect]()
     fileprivate var defPatterns = [String: UserSpacePattern]()
+    fileprivate var svgElement: SWXMLHash.XMLElement?
 
     fileprivate var styles = CSSParser()
 
@@ -148,6 +149,8 @@ open class SVGParser {
                 }
             }
         }
+        self.svgElement = svgElement
+        
         let layout = try svgElement.flatMap(parseViewBox)
         try parseSvg(parsedXml.children)
         let root = layout.flatMap { SVGCanvas(layout: $0, contents: nodes) } ?? Group(contents: nodes)
