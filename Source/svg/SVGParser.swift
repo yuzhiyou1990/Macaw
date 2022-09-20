@@ -102,6 +102,8 @@ open class SVGParser {
                                     "display"]
 
     fileprivate let xmlString: String
+    fileprivate var svgElement: XMLHash.XMLElement?
+    fileprivate var root: Group?
     fileprivate let initialPosition: Transform
 
     fileprivate var nodes = [Node]()
@@ -154,6 +156,8 @@ open class SVGParser {
         if let opacity = svgElement?.attribute(by: "opacity") {
             root.opacity = getOpacity(opacity.text)
         }
+        self.svgElement = svgElement
+        self.root = root
         return root
     }
 
@@ -925,12 +929,11 @@ open class SVGParser {
 
     fileprivate func parseRect(_ rect: XMLIndexer) -> Locus? {
         guard let element = rect.element,
-              let width = getDoubleValue(element, attribute: "width"),
-              let height = getDoubleValue(element, attribute: "height"), width > 0 && height > 0 else {
+              let width = getDimensionValue(element, attribute: "width")?.toPixels(total: 100),
+              let height  = getDimensionValue(element, attribute: "height")?.toPixels(total: 100), width > 0 && height > 0 else {
 
             return .none
         }
-
         let resultRect = Rect(x: getDoubleValue(element, attribute: "x") ?? 0,
                               y: getDoubleValue(element, attribute: "y") ?? 0,
                               w: width,
