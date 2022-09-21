@@ -76,6 +76,15 @@ open class SVGParser {
     open class func parse(text: String) throws -> Node {
         return try SVGParser(text).parse()
     }
+    
+    /// Parse the specified content of an SVG file.
+    /// - returns: Root node of the corresponding Macaw scene.
+    open class func parse(data: Data) throws -> Node {
+        guard let text = String(data: data, encoding: .utf8) else {
+            throw SVGParserError.invalidContentMode
+        }
+        return try SVGParser(text).parse()
+    }
 
     let availableStyleAttributes = ["stroke",
                                     "stroke-width",
