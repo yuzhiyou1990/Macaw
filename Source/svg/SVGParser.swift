@@ -102,8 +102,7 @@ open class SVGParser {
                                     "display"]
 
     fileprivate let xmlString: String
-    fileprivate var svgElement: XMLHash.XMLElement?
-    fileprivate var root: Group?
+    fileprivate var svgLayout: SVGNodeLayout?
     fileprivate let initialPosition: Transform
 
     fileprivate var nodes = [Node]()
@@ -151,13 +150,12 @@ open class SVGParser {
             }
         }
         let layout = try svgElement.flatMap(parseViewBox)
+        self.svgLayout = layout
         try parseSvg(parsedXml.children)
         let root = layout.flatMap { SVGCanvas(layout: $0, contents: nodes) } ?? Group(contents: nodes)
         if let opacity = svgElement?.attribute(by: "opacity") {
             root.opacity = getOpacity(opacity.text)
         }
-        self.svgElement = svgElement
-        self.root = root
         return root
     }
 
@@ -880,7 +878,7 @@ open class SVGParser {
         return dashes
     }
 
-	fileprivate func getMatrix(_ element: XMLHash.XMLElement, attribute: String) -> [Double] {
+    fileprivate func getMatrix(_ element: XMLHash.XMLElement, attribute: String) -> [Double] {
         var result = [Double]()
         if let values = element.allAttributes[attribute]?.text {
             let separatedValues = values.components(separatedBy: CharacterSet(charactersIn: " ,"))
@@ -929,8 +927,8 @@ open class SVGParser {
 
     fileprivate func parseRect(_ rect: XMLIndexer) -> Locus? {
         guard let element = rect.element,
-              let width = getDimensionValue(element, attribute: "width")?.toPixels(total: 100),
-              let height  = getDimensionValue(element, attribute: "height")?.toPixels(total: 100), width > 0 && height > 0 else {
+              let width = getDimensionValue(element, attribute: "width")?.toPixels(total: self.svgLayout?.viewBox?.w ?? 0),
+              let height  = getDimensionValue(element, attribute: "height")?.toPixels(total: self.svgLayout?.viewBox?.h ?? 0), width > 0 && height > 0 else {
 
             return .none
         }
