@@ -138,7 +138,9 @@ open class SVGParser {
             config.shouldProcessNamespaces = true
         }
         let parsedXml = config.parse(xmlString)
-
+        guard parsedXml.children.count > 0 else {
+            throw SVGParserError.invalidContentMode
+        }
         var svgElement: SWXMLHash.XMLElement?
         for child in parsedXml.children {
             if let element = child.element {
